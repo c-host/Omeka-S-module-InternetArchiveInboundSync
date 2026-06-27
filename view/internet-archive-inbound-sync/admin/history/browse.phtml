@@ -1,0 +1,52 @@
+<?php
+$translate = $this->plugin('translate');
+?>
+<?php echo $this->pageTitle($translate('Import history'), 1, $translate('IA Inbound')); ?>
+
+<table class="tablesaw">
+    <thead>
+        <tr>
+            <th><?php echo $translate('ID'); ?></th>
+            <th><?php echo $translate('Started'); ?></th>
+            <th><?php echo $translate('Job'); ?></th>
+            <th><?php echo $translate('Stats'); ?></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->runs as $run): ?>
+        <?php $stats = $run['stats'] ?? []; ?>
+        <tr>
+            <td><?php echo (int) $run['id']; ?></td>
+            <td><?php echo $this->escapeHtml($run['started']); ?></td>
+            <td>
+                <?php if (!empty($run['job_id'])): ?>
+                <a href="<?php echo $this->url('admin/id', ['controller' => 'job', 'id' => $run['job_id']]); ?>">
+                    #<?php echo (int) $run['job_id']; ?>
+                </a>
+                <?php else: ?>
+                —
+                <?php endif; ?>
+            </td>
+            <td>
+                <?php
+                $parts = [];
+                foreach (['created', 'skipped', 'updated', 'failed'] as $k) {
+                    if (!empty($stats[$k])) {
+                        $parts[] = $k . ': ' . (int) $stats[$k];
+                    }
+                }
+                echo $this->escapeHtml($parts ? implode(', ', $parts) : '—');
+                ?>
+            </td>
+            <td>
+                <a href="<?php echo $this->url('admin/internet-archive-inbound-sync/default', [
+                    'controller' => 'history',
+                    'action' => 'show',
+                    'id' => $run['id'],
+                ]); ?>"><?php echo $translate('Details'); ?></a>
+            </td>
+        </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>

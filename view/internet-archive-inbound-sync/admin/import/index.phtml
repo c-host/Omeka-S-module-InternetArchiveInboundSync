@@ -1,0 +1,46 @@
+<?php
+$translate = $this->plugin('translate');
+$form = $this->form;
+$form->prepare();
+?>
+<?php echo $this->pageTitle($translate('Import from Internet Archive'), 1, $translate('IA Inbound')); ?>
+
+<?php echo $this->partial('internet-archive-inbound-sync/admin/partials/setup-checklist'); ?>
+
+<p><?php echo $translate('Sources are combined: collection (optional), identifiers, and URLs are merged and deduplicated. Items outside any IA collection are imported via identifier or URL lines only.'); ?></p>
+<p><?php echo $translate('Imports run as background jobs—track progress under Admin → Jobs and IA Inbound → History.'); ?></p>
+
+<div class="alert warning ia-inbound-metadata-notice">
+    <strong><?php echo $translate('Review imported metadata'); ?></strong>
+    <p><?php echo $translate('This import module is not perfect. Always double-check items after import—especially title, subject, description, and language fields. Text may be concatenated or split incorrectly when Internet Archive stores bilingual or multi-part values. Language is taken from IA when specified; image items often have no IA language and will not receive a default. Correct any mistakes in Omeka before publishing or using IA Outbound.'); ?></p>
+</div>
+
+<?php echo $this->form()->openTag($form); ?>
+<?php echo $this->formCollection($form); ?>
+<?php echo $this->form()->closeTag(); ?>
+
+<?php if ($this->dryRunSummary): ?>
+<h3><?php echo $translate('Dry run summary'); ?></h3>
+<table class="tablesaw">
+    <thead>
+        <tr>
+            <th><?php echo $translate('Identifier'); ?></th>
+            <th><?php echo $translate('Titles'); ?></th>
+            <th><?php echo $translate('Media'); ?></th>
+            <th><?php echo $translate('IIIF media'); ?></th>
+            <th><?php echo $translate('Error'); ?></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($this->dryRunSummary['items'] as $row): ?>
+        <tr>
+            <td><?php echo $this->escapeHtml($row['identifier']); ?></td>
+            <td><?php echo isset($row['title_count']) ? (int) $row['title_count'] : '—'; ?></td>
+            <td><?php echo isset($row['media_count']) ? (int) $row['media_count'] : '—'; ?></td>
+            <td><?php echo !empty($row['include_iiif_media']) ? $translate('yes') : $translate('no'); ?></td>
+            <td><?php echo $this->escapeHtml($row['error'] ?? ''); ?></td>
+        </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+<?php endif; ?>

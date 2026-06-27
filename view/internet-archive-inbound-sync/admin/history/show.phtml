@@ -1,0 +1,47 @@
+<?php
+$translate = $this->plugin('translate');
+$run = $this->run;
+$stats = $run['stats'] ?? [];
+?>
+<?php echo $this->pageTitle($translate('Run #%s', $run['id']), 1, $translate('IA Inbound')); ?>
+
+<dl>
+    <dt><?php echo $translate('Started'); ?></dt>
+    <dd><?php echo $this->escapeHtml($run['started']); ?></dd>
+    <?php if (!empty($run['job_id'])): ?>
+    <dt><?php echo $translate('Omeka job'); ?></dt>
+    <dd>
+        <a href="<?php echo $this->url('admin/id', ['controller' => 'job', 'id' => $run['job_id']]); ?>">
+            #<?php echo (int) $run['job_id']; ?>
+        </a>
+    </dd>
+    <?php endif; ?>
+</dl>
+
+<h3><?php echo $translate('Parameters'); ?></h3>
+<pre><?php echo $this->escapeHtml(json_encode($run['parameters'] ?? [], JSON_PRETTY_PRINT)); ?></pre>
+
+<h3><?php echo $translate('Per-item results'); ?></h3>
+<?php if (!empty($stats['results'])): ?>
+<table class="tablesaw">
+    <thead>
+        <tr>
+            <th><?php echo $translate('Identifier'); ?></th>
+            <th><?php echo $translate('Status'); ?></th>
+            <th><?php echo $translate('Message'); ?></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($stats['results'] as $row): ?>
+        <tr>
+            <td><?php echo $this->escapeHtml($row['identifier'] ?? ''); ?></td>
+            <td><?php echo $this->escapeHtml($row['status'] ?? ''); ?></td>
+            <td><?php echo $this->escapeHtml($row['message'] ?? ''); ?></td>
+        </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+<?php endif; ?>
+
+<h3><?php echo $translate('Log'); ?></h3>
+<pre><?php echo $this->escapeHtml($run['log'] ?? ''); ?></pre>
